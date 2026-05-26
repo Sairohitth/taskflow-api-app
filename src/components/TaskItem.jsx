@@ -6,11 +6,11 @@ function TaskItem(props) {
         {props.task.completed ? "Done" : "Pending"}
       </p>
 
-      <button onClick={() => props.deleteTask(props.task.id)}>
+      <button onClick={() => props.deleteTask(props.task._id)}>
         Delete
       </button>
 
-      <button onClick={() => props.toggleTask(props.task.id)}>
+      <button onClick={() => props.toggleTask(props.task._id)}>
         Toggle Complete
       </button>
     </div>

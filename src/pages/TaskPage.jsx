@@ -23,84 +23,71 @@ function TaskPage() {
     useEffect(() => {
         async function fetchTasks() {
             try {
-                setLoading(true);
-                /*
-                FETCH VERSION
-
-                const response = await fetch(
-                    "https://jsonplaceholder.typicode.com/todos?_limit=5"
-                );
-
-                if (!response.ok) {
-                    throw new Error("Failed to fetch tasks");
-                }
-
-                const data = await response.json();
-                for(let i=0;i<1000000000;i++){}
-                */
-
-                
-                // AXIOS VERSION
-
-                const response = await axios.get(
-                    "https://jsonplaceholder.typicode.com/todos?_limit=5"
-                );
-
-                // for(let i=0;i<1000000000;i++){}
-
-                const data = response.data;
-
-                const formattedTasks = data.map((task) => ({
-                    id: task.id,
-                    title: task.title,
-                    completed: task.completed,
-                }));
-
-                setTasks(formattedTasks);
-                } catch (err) {
-                setError("Failed to fetch tasks");
-                } finally {
-                setLoading(false);
-                }
+                setLoading(true)
+                const res = await axios.get('http://localhost:5001/tasks')
+                setTasks(res.data)
+                setError('')
+            } catch (err) {
+                setError('Failed to fetch tasks')
+            } finally {
+                setLoading(false)
             }
-
-        fetchTasks();
-    }, []);
-
-    function addTask() {
-        if (input.trim() === "") {
-            return;
         }
 
-        const newTask = {
-            id: Date.now(),
-            title: input,
-            completed: false,
-        };
+    fetchTasks()
+    }, [])
 
-        setTasks([...tasks, newTask]);
-        setInput("");
-        inputRef.current.focus();
-    }
-
-    function deleteTask(id) {
-        const updatedTasks = tasks.filter((task) => task.id !== id);
-        setTasks(updatedTasks);
-    }
-
-  function toggleTask(id) {
-        const updatedTasks = tasks.map((task) => {
-        if (task.id === id) {
-            return {
-            ...task,
-            completed: !task.completed,
-            };
+    async function addTask(e) {
+        e.preventDefault()
+        if (!input.trim()) return
+        try {
+            const res = await axios.post(
+                'http://localhost:5001/tasks',
+                {
+                    title: input
+                }
+            )
+            setTasks([...tasks, res.data])
+            setInput("")
+            inputRef.current.focus()
+        } catch (err) {
+            console.log(err)
         }
+    }
 
-        return task;
-    });
+    async function deleteTask(id) {
+        try {
+            await axios.delete(
+                `http://localhost:5001/tasks/${id}`
+            )
+            const updatedTasks = tasks.filter(
+                (task) => task._id !== id
+            )
+            setTasks(updatedTasks)
+        } catch (err) {
+            console.log(err)
+        }
+    }
 
-        setTasks(updatedTasks);
+    async function toggleTask(id) {
+        try {
+            const taskToUpdate = tasks.find((task) => task._id === id)
+            const res = await axios.patch(
+                `http://localhost:5001/tasks/${id}`,
+                {
+                    completed: !taskToUpdate.completed
+                }
+            )
+            const updatedTasks = tasks.map((task) => {
+                if (task._id === id) {
+                    return res.data
+                }
+                return task
+            })
+            setTasks(updatedTasks)
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     if (loading) {

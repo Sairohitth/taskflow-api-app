@@ -5,7 +5,7 @@ function TaskList(props) {
     <div>
       {props.tasks.map((task) => (
         <TaskItem
-          key={task.id}
+          key={task._id}
           task={task}
           deleteTask={props.deleteTask}
           toggleTask={props.toggleTask}

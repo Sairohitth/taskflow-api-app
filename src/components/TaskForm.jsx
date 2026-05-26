@@ -1,6 +1,9 @@
 function TaskForm(props) {
+
   return (
-    <div>
+
+    <form onSubmit={props.addTask}>
+
       <input
         type="text"
         placeholder="Enter task"
@@ -9,8 +12,10 @@ function TaskForm(props) {
         ref={props.inputRef}
       />
 
-      <button onClick={props.addTask}>Add</button>
-    </div>
+      <button type="submit">Add</button>
+
+    </form>
+
   );
 }
 
