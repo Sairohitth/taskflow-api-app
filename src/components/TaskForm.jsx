@@ -12,7 +12,9 @@ function TaskForm(props) {
         ref={props.inputRef}
       />
 
-      <button type="submit">Add</button>
+      <button type="submit" disabled={props.adding}>
+        {props.adding ? "Adding..." : "Add"}
+      </button>
 
     </form>
 

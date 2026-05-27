@@ -11,6 +11,9 @@ function TaskPage() {
     const [error, setError] = useState("");
     const [filter, setFilter] = useState("all");
     const [search, setSearch] = useState("");
+    const [adding, setAdding] = useState(false);
+    const [deletingId, setDeletingId] = useState(null);
+    const [togglingId, setTogglingId] = useState(null);
 
     const inputRef = useRef(null);
 
@@ -41,6 +44,7 @@ function TaskPage() {
         e.preventDefault()
         if (!input.trim()) return
         try {
+            setAdding(true);
             const res = await axios.post(
                 'http://localhost:5001/tasks',
                 {
@@ -50,13 +54,17 @@ function TaskPage() {
             setTasks([...tasks, res.data])
             setInput("")
             inputRef.current.focus()
+            setError("");
         } catch (err) {
-            console.log(err)
+            setError("Failed to add task");
+        }finally{
+            setAdding(false)
         }
     }
 
     async function deleteTask(id) {
         try {
+            setDeletingId(id);
             await axios.delete(
                 `http://localhost:5001/tasks/${id}`
             )
@@ -64,13 +72,17 @@ function TaskPage() {
                 (task) => task._id !== id
             )
             setTasks(updatedTasks)
+            setError("");
         } catch (err) {
-            console.log(err)
+            setError("Failed to delete task");
+        }finally{
+            setDeletingId(null)
         }
     }
 
     async function toggleTask(id) {
         try {
+            setTogglingId(id);
             const taskToUpdate = tasks.find((task) => task._id === id)
             const res = await axios.patch(
                 `http://localhost:5001/tasks/${id}`,
@@ -85,8 +97,11 @@ function TaskPage() {
                 return task
             })
             setTasks(updatedTasks)
+            setError("");
         } catch (err) {
-            console.log(err)
+            setError("Failed to update task");
+        }finally{
+            setTogglingId(null);
         }
     }
 
@@ -119,6 +134,7 @@ function TaskPage() {
         setInput={setInput}
         addTask={addTask}
         inputRef={inputRef}
+        adding={adding}
         />
         <TaskControls
             search={search}
@@ -131,6 +147,8 @@ function TaskPage() {
         tasks={filteredTasks}
         deleteTask={deleteTask}
         toggleTask={toggleTask}
+        deletingId={deletingId}
+        togglingId={togglingId}
         />
     </div>
   );
